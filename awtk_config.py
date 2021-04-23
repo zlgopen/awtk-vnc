@@ -9,20 +9,20 @@ def joinPath(root, subdir):
 
 CWD=os.path.normpath(os.path.abspath(os.path.dirname(__file__)));
 
-TK_LINUX_FB_ROOT = CWD
-TK_ROOT          = joinPath(TK_LINUX_FB_ROOT, '../awtk')
+AWTK_VNC_ROOT = CWD
+TK_ROOT          = joinPath(AWTK_VNC_ROOT, '../awtk')
 TK_SRC           = joinPath(TK_ROOT, 'src')
 TK_3RD_ROOT      = joinPath(TK_ROOT, '3rd')
 GTEST_ROOT       = joinPath(TK_ROOT, '3rd/gtest/googletest')
 
-BUILD_DIR        = joinPath(TK_LINUX_FB_ROOT, 'build')
+BUILD_DIR        = joinPath(AWTK_VNC_ROOT, 'build')
 BIN_DIR          = joinPath(BUILD_DIR, 'bin')
 LIB_DIR          = joinPath(BUILD_DIR, 'lib')
 VAR_DIR          = joinPath(BUILD_DIR, 'var')
 TK_DEMO_ROOT     = joinPath(TK_ROOT, 'demos')
 
-LCD_DIR        = joinPath(TK_LINUX_FB_ROOT, 'awtk-port/lcd_linux')
-INPUT_DIR      = joinPath(TK_LINUX_FB_ROOT, 'awtk-port/input_thread')
+LCD_DIR        = joinPath(AWTK_VNC_ROOT, 'awtk-port/lcd_linux')
+INPUT_DIR      = joinPath(AWTK_VNC_ROOT, 'awtk-port/input_thread')
 
 # lcd devices
 LCD_DEICES='fb'
@@ -31,7 +31,7 @@ NANOVG_BACKEND='AGGE'
 
 INPUT_ENGINE='pinyin'
 
-COMMON_CCFLAGS=' -DHAS_STD_MALLOC -DHAS_STDIO -DHAS_FAST_MEMCPY -DWITH_VGCANVAS -DWITH_UNICODE_BREAK -DLINUX'
+COMMON_CCFLAGS=' -DHAS_STD_MALLOC -DHAS_STDIO -DHAS_FAST_MEMCPY -DWITH_VGCANVAS -DWITH_UNICODE_BREAK'
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DLOAD_ASSET_WITH_MMAP=1 '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_ASSET_LOADER -DWITH_FS_RES -DHAS_GET_TIME_US64=1 ' 
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DSTBTT_STATIC -DSTB_IMAGE_STATIC -DWITH_STB_IMAGE -DWITH_STB_FONT -DWITH_TEXT_BIDI=1 '
@@ -72,10 +72,21 @@ LD=TOOLS_PREFIX+'g++',
 AR=TOOLS_PREFIX+'ar',
 RANLIB=TOOLS_PREFIX+'ranlib',
 STRIP=TOOLS_PREFIX+'strip',
-OS_LIBS = ['stdc++', 'pthread', 'rt', 'm', 'dl']
+OS_NAME = platform.system();
 
-OS_LINKFLAGS= OS_LINKFLAGS + ' -Wl,-rpath=./bin -Wl,-rpath=./ ' 
-COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DLINUX -DHAS_PTHREAD -DENABLE_CURSOR -fPIC '
+if OS_NAME == 'Darwin':
+  COMMON_CCFLAGS=COMMON_CCFLAGS+' -DMACOS '
+  OS_LIBS = ['stdc++', 'pthread', 'm', 'dl']
+elif OS_NAME == 'Linux':
+  COMMON_CCFLAGS=COMMON_CCFLAGS+' -DLINUX '
+  OS_LIBS = ['stdc++', 'pthread', 'rt', 'm', 'dl']
+elif OS_NAME == 'Windows':
+  COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWIN32 '
+else:
+  print('not support ' + OS_NAME)
+
+
+COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DHAS_PTHREAD -DENABLE_CURSOR -fPIC '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_DATA_READER_WRITER=1 '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_EVENT_RECORDER_PLAYER=1 '
 COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DWITH_WIDGET_TYPE_CHECK=1 '
@@ -96,8 +107,6 @@ else:
 
 STATIC_LIBS = STATIC_LIBS + ['nanovg-agge', 'agge', 'nanovg']  + OS_LIBS
 AWTK_DLL_DEPS_LIBS = ['nanovg-agge', 'agge', 'nanovg'] + OS_LIBS
-
-OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lfribidi -lawtk_global -lextwidgets -lwidgets -lawtk_vnc -lvncserver -lbase -lgpinyin -ltkc_static -lstreams -lconf_io -lhal -lcsv -lubjson -lcompressors -lmbedtls -lminiz -llinebreak -Wl,--no-whole-archive'
 
 LIBS=STATIC_LIBS
 
@@ -146,8 +155,8 @@ os.environ['TOOLS_NAME'] = '';
 os.environ['GRAPHIC_BUFFER'] = GRAPHIC_BUFFER;
 os.environ['WITH_AWTK_SO'] = 'true'
 os.environ['NATIVE_WINDOW'] = 'raw';
+os.environ['OS_WHOLE_ARCHIVE'] = '';
 
-os.environ['OS_WHOLE_ARCHIVE'] = OS_WHOLE_ARCHIVE;
 os.environ['AWTK_DLL_DEPS_LIBS'] = ';'.join(AWTK_DLL_DEPS_LIBS)
 os.environ['STATIC_LIBS'] = ';'.join(STATIC_LIBS)
 
