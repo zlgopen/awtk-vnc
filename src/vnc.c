@@ -200,7 +200,6 @@ ret_t vnc_update_screen(uint8_t* fb, int w, int h, int bpp, rect_t* dirty_rect) 
   uint32_t* dst_fb = NULL;
   uint32_t* src_fb = (uint32_t*)fb;
   vnc_server_t* vnc = s_vnc_server;
-  uint32_t row_size = r->w * vnc->bpp;
 
   if (vnc == NULL || vnc->client == NULL) {
     return RET_OK;
@@ -211,12 +210,28 @@ ret_t vnc_update_screen(uint8_t* fb, int w, int h, int bpp, rect_t* dirty_rect) 
   dst_fb = (uint32_t*)(vnc->rfbScreen->frameBuffer);
   return_value_if_fail(fb != NULL && s_vnc_server != NULL && r != NULL, RET_BAD_PARAMS);
 
-  for (i = 0; i < r->h; i++) {
-    uint32_t offset = (r->y + i) * vnc->w + r->x;
+  if (r->w == w && r->h == h && r->x == 0 && r->y == 0) {
+    uint32_t size = w * h * bpp;
+    memcpy(dst_fb, src_fb, size);
+    log_debug("dirty1 %d %d %d %d\n", r->x, r->y, r->w, r->h);
+  } else if (r->w == w && r->x == 0) {
+    uint32_t offset = r->y * w;
     uint32_t* src = src_fb + offset;
     uint32_t* dst = dst_fb + offset;
+    uint32_t size = w * r->h * bpp;
 
-    memcpy(dst, src, row_size);
+    memcpy(dst, src, size);
+    log_debug("dirty2 %d %d %d %d\n", r->x, r->y, r->w, r->h);
+  } else {
+    uint32_t row_size = r->w * bpp;
+    for (i = 0; i < r->h; i++) {
+      uint32_t offset = (r->y + i) * w + r->x;
+      uint32_t* src = src_fb + offset;
+      uint32_t* dst = dst_fb + offset;
+
+      memcpy(dst, src, row_size);
+    }
+    log_debug("dirty3 %d %d %d %d\n", r->x, r->y, r->w, r->h);
   }
 
   rfbMarkRectAsModified(vnc->rfbScreen, r->x, r->y, r->x + r->w, r->y + r->h);
