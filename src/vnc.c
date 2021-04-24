@@ -1,9 +1,9 @@
 /**
  * File:   vnc.c
  * Author: AWTK Develop Team
- * Brief:  main loop for vnc
+ * Brief:  vnc thread
  *
- * Copyright (c) 2018 - 2020  Guangzhou ZHIYUAN Electronics Co.,Ltd.
+ * Copyright (c) 2018 - 2021  Guangzhou ZHIYUAN Electronics Co.,Ltd.
  *
  * this program is distributed in the hope that it will be useful,
  * but without any warranty; without even the implied warranty of
@@ -18,6 +18,7 @@
  * 2021-04-23 li xianjing <xianjimli@hotmail.com> created
  *
  */
+
 #include "vnc.h"
 #include "tkc/mutex.h"
 #include "tkc/thread.h"
@@ -110,6 +111,11 @@ static void clientgone(rfbClientPtr cl) {
   log_debug("client disconnected: %p\n", cl);
 }
 
+static ret_t idle_request_redraw(const idle_info_t* info) {
+  widget_invalidate_force(window_manager(), NULL);
+  return RET_REMOVE;
+}
+
 static enum rfbNewClientAction newclient(rfbClientPtr cl) {
   vnc_server_t* vnc = s_vnc_server;
 
@@ -117,8 +123,8 @@ static enum rfbNewClientAction newclient(rfbClientPtr cl) {
   cl->clientData = vnc;
   cl->clientGoneHook = clientgone;
   log_debug("client connected: %p\n", cl);
-  /*repaint*/
-  widget_invalidate_force(window_manager(), NULL);
+
+  idle_add(idle_request_redraw, NULL);
 
   return RFB_CLIENT_ACCEPT;
 }
