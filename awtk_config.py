@@ -80,7 +80,7 @@ if OS_NAME == 'Darwin':
   OS_WHOLE_ARCHIVE=' -all_load '
 elif OS_NAME == 'Linux':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DLINUX '
-  OS_LIBS = ['stdc++', 'pthread', 'rt', 'iconv', 'm', 'dl']
+  OS_LIBS = ['stdc++', 'pthread', 'rt', 'm', 'dl']
   OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lawtk_global -lextwidgets -lwidgets -lbase -lgpinyin -lstreams -lconf_io -lhal -lcsv -lubjson -lcompressors -lfribidi -lmbedtls -lminiz -ltkc_static -llinebreak -Wl,--no-whole-archive'
 elif OS_NAME == 'Windows':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWIN32 '
