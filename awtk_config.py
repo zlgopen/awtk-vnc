@@ -76,10 +76,12 @@ OS_NAME = platform.system();
 
 if OS_NAME == 'Darwin':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DMACOS '
-  OS_LIBS = ['stdc++', 'pthread', 'm', 'dl']
+  OS_LIBS = ['stdc++', 'pthread', 'iconv', 'm', 'dl']
+  OS_WHOLE_ARCHIVE=' -all_load '
 elif OS_NAME == 'Linux':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DLINUX '
-  OS_LIBS = ['stdc++', 'pthread', 'rt', 'm', 'dl']
+  OS_LIBS = ['stdc++', 'pthread', 'rt', 'iconv', 'm', 'dl']
+  OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lawtk_global -lextwidgets -lwidgets -lbase -lgpinyin -lstreams -lconf_io -lhal -lcsv -lubjson -lcompressors -lfribidi -lmbedtls -lminiz -ltkc_static -llinebreak -Wl,--no-whole-archive'
 elif OS_NAME == 'Windows':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWIN32 '
 else:
@@ -99,14 +101,13 @@ LINKFLAGS=OS_LINKFLAGS;
 LIBPATH=[LIB_DIR, BIN_DIR] + OS_LIBPATH
 CCFLAGS=OS_FLAGS + COMMON_CCFLAGS 
 
-STATIC_LIBS =['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver','base', 'gpinyin', 'streams', 'conf_io', 'hal', 'csv', 'compressors', 'miniz', 'ubjson', 'tkc_static', 'linebreak', 'mbedtls', 'fribidi']
+STATIC_LIBS =['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'streams', 'conf_io', 'hal', 'csv', 'compressors', 'miniz', 'ubjson', 'tkc_static', 'linebreak', 'mbedtls', 'fribidi']
 if TSLIB_LIB_DIR != '':
   SHARED_LIBS=['awtk', 'ts'] + OS_LIBS;
 else:
   SHARED_LIBS=['awtk'] + OS_LIBS;
 
 STATIC_LIBS = STATIC_LIBS + ['nanovg-agge', 'agge', 'nanovg']  + OS_LIBS
-AWTK_DLL_DEPS_LIBS = ['nanovg-agge', 'agge', 'nanovg'] + OS_LIBS
 
 LIBS=STATIC_LIBS
 
@@ -138,6 +139,10 @@ if TSLIB_LIB_DIR != '':
   LIBPATH = [TSLIB_LIB_DIR] + LIBPATH;
   CPPPATH = [TSLIB_INC_DIR] + CPPPATH;
 
+NANOVG_BACKEND_LIBS=['nanovg-agge', 'nanovg', 'agge'];
+AWTK_STATIC_LIBS=['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'streams', 'conf_io', 'hal', 'csv', 'ubjson', 'compressors', 'fribidi', 'mbedtls', 'miniz', 'tkc_static', 'linebreak', 'mbedtls']
+AWTK_DLL_DEPS_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + OS_LIBS
+
 os.environ['LCD'] = LCD
 os.environ['LCD_DEICES'] = LCD_DEICES
 os.environ['TARGET_ARCH'] = 'arm'
@@ -155,7 +160,7 @@ os.environ['TOOLS_NAME'] = '';
 os.environ['GRAPHIC_BUFFER'] = GRAPHIC_BUFFER;
 os.environ['WITH_AWTK_SO'] = 'true'
 os.environ['NATIVE_WINDOW'] = 'raw';
-os.environ['OS_WHOLE_ARCHIVE'] = '';
+os.environ['OS_WHOLE_ARCHIVE'] = OS_WHOLE_ARCHIVE;
 
 os.environ['AWTK_DLL_DEPS_LIBS'] = ';'.join(AWTK_DLL_DEPS_LIBS)
 os.environ['STATIC_LIBS'] = ';'.join(STATIC_LIBS)
@@ -164,7 +169,17 @@ def has_custom_cc():
     return True
 
 def copySharedLib(src, dst, name):
-  src = os.path.join(src, 'build/bin/lib'+name+'.so')
+  if name == 'awtk':
+    src = os.path.join(src, 'build');
+
+  if OS_NAME == 'Darwin':
+    src = os.path.join(src, 'bin/lib'+name+'.dylib')
+  elif OS_NAME == 'Linux':
+    src = os.path.join(src, 'bin/lib'+name+'.so')
+  else:
+    print('not support ' + OS_NAME)
+    return
+	
   src = os.path.normpath(src);
   dst = os.path.normpath(dst);
 
@@ -172,7 +187,7 @@ def copySharedLib(src, dst, name):
       return
 
   if not os.path.exists(src):
-    print('Can\'t find ' + src + '. Please build '+name+'before!')
+    print('Can\'t find ' + src + '. Please build '+name+' before!')
   else:
     if not os.path.exists(dst):
         os.makedirs(dst)
