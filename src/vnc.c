@@ -27,64 +27,36 @@
 #include <rfb/rfb.h>
 #include <rfb/keysym.h>
 
-static const int32_t s_key_map[0xffff] = {
-    [XK_1] = TK_KEY_1,
-    [XK_2] = TK_KEY_2,
-    [XK_3] = TK_KEY_3,
-    [XK_4] = TK_KEY_4,
-    [XK_5] = TK_KEY_5,
-    [XK_6] = TK_KEY_6,
-    [XK_7] = TK_KEY_7,
-    [XK_8] = TK_KEY_8,
-    [XK_9] = TK_KEY_9,
-    [XK_0] = TK_KEY_0,
-    [XK_A] = TK_KEY_a,
-    [XK_B] = TK_KEY_b,
-    [XK_C] = TK_KEY_c,
-    [XK_D] = TK_KEY_d,
-    [XK_E] = TK_KEY_e,
-    [XK_F] = TK_KEY_f,
-    [XK_G] = TK_KEY_g,
-    [XK_H] = TK_KEY_h,
-    [XK_I] = TK_KEY_i,
-    [XK_J] = TK_KEY_j,
-    [XK_K] = TK_KEY_k,
-    [XK_L] = TK_KEY_l,
-    [XK_M] = TK_KEY_m,
-    [XK_N] = TK_KEY_n,
-    [XK_O] = TK_KEY_o,
-    [XK_P] = TK_KEY_p,
-    [XK_Q] = TK_KEY_q,
-    [XK_R] = TK_KEY_r,
-    [XK_S] = TK_KEY_s,
-    [XK_T] = TK_KEY_t,
-    [XK_U] = TK_KEY_u,
-    [XK_V] = TK_KEY_v,
-    [XK_W] = TK_KEY_w,
-    [XK_X] = TK_KEY_x,
-    [XK_Y] = TK_KEY_y,
-    [XK_Z] = TK_KEY_z,
-    [XK_F1] = TK_KEY_F1,
-    [XK_F2] = TK_KEY_F2,
-    [XK_F3] = TK_KEY_F3,
-    [XK_F4] = TK_KEY_F4,
-    [XK_F5] = TK_KEY_F5,
-    [XK_F6] = TK_KEY_F6,
-    [XK_F7] = TK_KEY_F7,
-    [XK_F8] = TK_KEY_F8,
-    [XK_F9] = TK_KEY_F9,
-    [XK_Escape] = TK_KEY_ESCAPE,
-    [XK_Tab] = TK_KEY_TAB,
-    [XK_Left] = TK_KEY_LEFT,
-    [XK_Right] = TK_KEY_RIGHT,
-    [XK_Up] = TK_KEY_UP,
-    [XK_Down] = TK_KEY_DOWN,
-    [XK_Return] = TK_KEY_RETURN,
-    [XK_BackSpace] = TK_KEY_BACKSPACE,
-};
-
 static int32_t map_key(uint16_t code) {
-  return s_key_map[code];
+  if (code < 0x255) {
+    return code;
+  }
+
+  switch(code) {
+    case XK_F1: return TK_KEY_F1;
+    case XK_F2: return TK_KEY_F2;
+    case XK_F3: return TK_KEY_F3;
+    case XK_F4: return TK_KEY_F4;
+    case XK_F5: return TK_KEY_F5;
+    case XK_F6: return TK_KEY_F6;
+    case XK_F7: return TK_KEY_F7;
+    case XK_F8: return TK_KEY_F8;
+    case XK_F9: return TK_KEY_F9;
+    case XK_F10: return TK_KEY_F10;
+    case XK_F11: return TK_KEY_F11;
+    case XK_F12: return TK_KEY_F12;
+    case XK_Escape: return TK_KEY_ESCAPE;
+    case XK_Tab: return TK_KEY_TAB;
+    case XK_Left: return TK_KEY_LEFT;
+    case XK_Right: return TK_KEY_RIGHT;
+    case XK_Up: return TK_KEY_UP;
+    case XK_Down: return TK_KEY_DOWN;
+    case XK_Return: return TK_KEY_RETURN;
+    case XK_BackSpace: return TK_KEY_BACKSPACE;
+    default: break;
+  }
+
+  return TK_KEY_0;
 }
 
 typedef struct _vnc_server_t {
