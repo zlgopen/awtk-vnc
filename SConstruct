@@ -35,12 +35,17 @@ TK_ROOT_VAR = awtk.joinPath(awtk.VAR_DIR, 'awtk')
 VariantDir(TK_ROOT_VAR, awtk.TK_ROOT)
 APP_PROJ_VAR = [awtk.joinPath(TK_ROOT_VAR, 'demos/SConscript')]
 
+def add_var_path(iter):
+  return awtk.joinPath(TK_ROOT_VAR, iter)
+
+VGCANVAS_PROJS = []
+for i in awtk.VGCANVAS_PROJS:
+  VGCANVAS_PROJS.append(awtk.joinPath(TK_ROOT_VAR, i))
+  
+print(VGCANVAS_PROJS)
 SConscriptFiles=[
   awtk.joinPath(TK_ROOT_VAR, '3rd/mbedtls/SConscript'),
-  awtk.joinPath(TK_ROOT_VAR, '3rd/nanovg/SConscript'),
   awtk.joinPath(TK_ROOT_VAR, '3rd/cjson/SConscript'),
-  awtk.joinPath(TK_ROOT_VAR, '3rd/agg/SConscript'),
-  awtk.joinPath(TK_ROOT_VAR, '3rd/agge/SConscript'),
   awtk.joinPath(TK_ROOT_VAR, '3rd/fribidi/SConscript'),
   awtk.joinPath(TK_ROOT_VAR, '3rd/gpinyin/SConscript'), 
   awtk.joinPath(TK_ROOT_VAR, '3rd/libunibreak/SConscript'),
@@ -54,7 +59,8 @@ SConscriptFiles=[
   awtk.joinPath(TK_ROOT_VAR, 'src/compressors/SConscript'),
   awtk.joinPath(TK_ROOT_VAR, 'tools/common/SConscript'), 
   awtk.joinPath(TK_ROOT_VAR, 'tools/ui_gen/xml_to_ui/SConscript'),
-  'src/SConscript',
-  ] + APP_PROJ_VAR;
+  ] + APP_PROJ_VAR + VGCANVAS_PROJS
 
+
+print(SConscriptFiles)
 SConscript(SConscriptFiles)

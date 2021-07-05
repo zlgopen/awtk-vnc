@@ -27,15 +27,26 @@ INPUT_DIR      = joinPath(AWTK_VNC_ROOT, 'awtk-port/input_thread')
 # lcd devices
 LCD_DEICES='fb'
 LCD='LINUX_FB'
-NANOVG_BACKEND='AGGE'
+#VGCANVAS='CAIRO'
+VGCANVAS='NANOVG'
 
 INPUT_ENGINE='pinyin'
 
-COMMON_CCFLAGS=' -DHAS_STD_MALLOC -DHAS_STDIO -DHAS_FAST_MEMCPY -DWITH_VGCANVAS -DWITH_UNICODE_BREAK'
+COMMON_CCFLAGS=' -DHAS_STD_MALLOC1 -DHAS_STDIO -DHAS_FAST_MEMCPY -DWITH_VGCANVAS -DWITH_UNICODE_BREAK'
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DLOAD_ASSET_WITH_MMAP=1 '
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_ASSET_LOADER -DWITH_FS_RES -DHAS_GET_TIME_US64=1 ' 
 COMMON_CCFLAGS=COMMON_CCFLAGS+' -DSTBTT_STATIC -DSTB_IMAGE_STATIC -DWITH_STB_IMAGE -DWITH_STB_FONT -DWITH_TEXT_BIDI=1 '
-COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_NANOVG_AGGE '
+
+if VGCANVAS == 'CAIRO':
+  NANOVG_BACKEND=''
+  NANOVG_BACKEND_LIBS=['cairo', 'pixman'];
+  VGCANVAS_PROJS=['3rd/cairo/SConscript', '3rd/pixman/SConscript'];
+  COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DWITH_VGCANVAS_CAIRO -DHAVE_CONFIG_H -DCAIRO_WIN32_STATIC_BUILD '
+else:
+  NANOVG_BACKEND='AGGE'
+  COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWITH_NANOVG_AGGE '
+  NANOVG_BACKEND_LIBS=['nanovg-agge', 'nanovg', 'agge'];
+  VGCANVAS_PROJS=['3rd/nanovg/SConscript', '3rd/agge/SConscript'];
 
 if INPUT_ENGINE == 't9':
     COMMON_CCFLAGS = COMMON_CCFLAGS + ' -DWITH_IME_T9 '
@@ -107,7 +118,7 @@ if TSLIB_LIB_DIR != '':
 else:
   SHARED_LIBS=['awtk'] + OS_LIBS;
 
-STATIC_LIBS = STATIC_LIBS + ['nanovg-agge', 'agge', 'nanovg']  + OS_LIBS
+STATIC_LIBS = STATIC_LIBS + NANOVG_BACKEND_LIBS + OS_LIBS
 
 LIBS=STATIC_LIBS
 
@@ -121,6 +132,8 @@ CPPPATH=[TK_ROOT,
   joinPath(TK_ROOT, 'tools'), 
   joinPath(TK_3RD_ROOT, 'agge'), 
   joinPath(TK_3RD_ROOT, 'agg/include'), 
+  joinPath(TK_3RD_ROOT, 'pixman'), 
+  joinPath(TK_3RD_ROOT, 'cairo'),
   joinPath(TK_3RD_ROOT, 'nanovg'), 
   joinPath(TK_3RD_ROOT, 'nanovg/gl'), 
   joinPath(TK_3RD_ROOT, 'nanovg/base'), 
@@ -139,7 +152,6 @@ if TSLIB_LIB_DIR != '':
   LIBPATH = [TSLIB_LIB_DIR] + LIBPATH;
   CPPPATH = [TSLIB_INC_DIR] + CPPPATH;
 
-NANOVG_BACKEND_LIBS=['nanovg-agge', 'nanovg', 'agge'];
 AWTK_STATIC_LIBS=['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'streams', 'conf_io', 'hal', 'csv', 'ubjson', 'compressors', 'fribidi', 'mbedtls', 'miniz', 'tkc_static', 'linebreak', 'mbedtls']
 AWTK_DLL_DEPS_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + OS_LIBS
 
@@ -150,7 +162,7 @@ os.environ['BIN_DIR'] = BIN_DIR;
 os.environ['LIB_DIR'] = LIB_DIR;
 os.environ['TK_ROOT'] = TK_ROOT;
 os.environ['CCFLAGS'] = CCFLAGS;
-os.environ['VGCANVAS'] = 'NANOVG'
+os.environ['VGCANVAS'] = VGCANVAS
 os.environ['INPUT_ENGINE'] = INPUT_ENGINE;
 os.environ['TSLIB_LIB_DIR'] = TSLIB_LIB_DIR;
 os.environ['NANOVG_BACKEND'] = NANOVG_BACKEND;
