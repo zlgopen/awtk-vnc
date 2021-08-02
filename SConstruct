@@ -33,7 +33,12 @@ env = DefaultEnvironment(CCFLAGS = awtk.CCFLAGS + APP_CCFLAGS,
 
 TK_ROOT_VAR = awtk.joinPath(awtk.VAR_DIR, 'awtk')
 VariantDir(TK_ROOT_VAR, awtk.TK_ROOT)
-APP_PROJ_VAR = [awtk.joinPath(TK_ROOT_VAR, 'demos/SConscript')]
+
+VNC_PROP_VAR = awtk.joinPath(awtk.VAR_DIR, 'awtk-vnc') 
+VariantDir(VNC_PROP_VAR, os.getcwd())
+
+APP_PROJS = [awtk.joinPath(TK_ROOT_VAR, 'demos/SConscript'),
+  awtk.joinPath(VNC_PROP_VAR, 'src/SConscript')]
 
 def add_var_path(iter):
   return awtk.joinPath(TK_ROOT_VAR, iter)
@@ -59,8 +64,8 @@ SConscriptFiles=[
   awtk.joinPath(TK_ROOT_VAR, 'src/compressors/SConscript'),
   awtk.joinPath(TK_ROOT_VAR, 'tools/common/SConscript'), 
   awtk.joinPath(TK_ROOT_VAR, 'tools/ui_gen/xml_to_ui/SConscript'),
-  ] + APP_PROJ_VAR + VGCANVAS_PROJS
+  ] + APP_PROJS + VGCANVAS_PROJS
 
 
-print(SConscriptFiles)
+print(APP_PROJS)
 SConscript(SConscriptFiles)
