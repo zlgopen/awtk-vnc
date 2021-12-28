@@ -2,10 +2,10 @@ import os
 import platform
 import shutil
 
-OS_NAME = platform.system()
+from awtk_config_common import TKC_STATIC_LIBS
+from awtk_config_common import joinPath, toWholeArchive, genIdlAndDefEx, setEnvSpawn,genDllLinkFlags,copySharedLib
 
-def joinPath(root, subdir):
-  return os.path.normpath(os.path.join(root, subdir))
+OS_NAME = platform.system()
 
 CWD=os.path.normpath(os.path.abspath(os.path.dirname(__file__)));
 
@@ -88,11 +88,9 @@ OS_NAME = platform.system();
 if OS_NAME == 'Darwin':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DMACOS '
   OS_LIBS = ['stdc++', 'pthread', 'iconv', 'm', 'dl']
-  OS_WHOLE_ARCHIVE=' -all_load '
 elif OS_NAME == 'Linux':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DLINUX '
   OS_LIBS = ['stdc++', 'pthread', 'rt', 'm', 'dl']
-  OS_WHOLE_ARCHIVE =' -Wl,--whole-archive -lawtk_global -lextwidgets -lwidgets -lbase -lgpinyin -lstreams -lconf_io -lhal -lcsv -lubjson -lcompressors -lfribidi -lmbedtls -lminiz -ltkc_static -llinebreak -Wl,--no-whole-archive'
 elif OS_NAME == 'Windows':
   COMMON_CCFLAGS=COMMON_CCFLAGS+' -DWIN32 '
 else:
@@ -112,13 +110,13 @@ LINKFLAGS=OS_LINKFLAGS;
 LIBPATH=[LIB_DIR, BIN_DIR] + OS_LIBPATH
 CCFLAGS=OS_FLAGS + COMMON_CCFLAGS 
 
-STATIC_LIBS =['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'streams', 'conf_io', 'hal', 'csv', 'compressors', 'miniz', 'ubjson', 'tkc_static', 'linebreak', 'mbedtls', 'fribidi']
+STATIC_LIBS =['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'linebreak', 'fribidi']
 if TSLIB_LIB_DIR != '':
   SHARED_LIBS=['awtk', 'ts'] + OS_LIBS;
 else:
   SHARED_LIBS=['awtk'] + OS_LIBS;
 
-STATIC_LIBS = STATIC_LIBS + NANOVG_BACKEND_LIBS + OS_LIBS
+STATIC_LIBS = STATIC_LIBS + NANOVG_BACKEND_LIBS + TKC_STATIC_LIBS + OS_LIBS
 
 LIBS=STATIC_LIBS
 
@@ -152,8 +150,9 @@ if TSLIB_LIB_DIR != '':
   LIBPATH = [TSLIB_LIB_DIR] + LIBPATH;
   CPPPATH = [TSLIB_INC_DIR] + CPPPATH;
 
-AWTK_STATIC_LIBS=['awtk_global', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'streams', 'conf_io', 'hal', 'csv', 'ubjson', 'compressors', 'fribidi', 'mbedtls', 'miniz', 'tkc_static', 'linebreak', 'mbedtls']
-AWTK_DLL_DEPS_LIBS = AWTK_STATIC_LIBS + NANOVG_BACKEND_LIBS + OS_LIBS
+AWTK_STATIC_LIBS=LIBS
+AWTK_DLL_DEPS_LIBS = NANOVG_BACKEND_LIBS + OS_LIBS
+OS_WHOLE_ARCHIVE =toWholeArchive(LIBS)
 
 os.environ['LCD'] = LCD
 os.environ['LCD_DEICES'] = LCD_DEICES

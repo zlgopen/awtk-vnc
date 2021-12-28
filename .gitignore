@@ -9,3 +9,4 @@ release.tar.gz
 release
 .sconsign.dblite
 .vscode/*.*
+build
