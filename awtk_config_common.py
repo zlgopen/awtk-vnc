@@ -118,7 +118,7 @@ elif OS_NAME == 'Windows':
         os.makedirs(os.path.abspath(TK_LIB_DIR))
     if TOOLS_NAME == '':
         OS_LIBS = ['gdi32', 'user32', 'winmm.lib', 'imm32.lib', 'version.lib', 'shell32.lib',
-                   'ole32.lib', 'Oleaut32.lib', 'Advapi32.lib', 'DelayImp.lib', 'psapi.lib']
+                   'ole32.lib', 'Oleaut32.lib', 'Advapi32.lib', 'DelayImp.lib', 'psapi.lib', "ws2_32"]
         OS_FLAGS = '-DWIN32 -D_WIN32 -DWINDOWS /EHsc -D_CONSOLE  /DEBUG /Od  /FS /Z7 /utf-8 /MD '
         if TARGET_ARCH == 'x86':
             OS_LINKFLAGS = '/MACHINE:X86 /DEBUG '
@@ -139,7 +139,7 @@ elif OS_NAME == 'Windows':
         OS_FLAGS = '-DMINGW -DWINDOWS -D_CONSOLE -g -Wall'
         OS_LINKFLAGS = ' -Wl,-rpath=./bin -Wl,-rpath=./ '
         COMMON_CFLAGS = COMMON_CFLAGS+' -std=gnu99 '
-        OS_FLAGS = OS_FLAGS+' -U__FLT_EVAL_METHOD__ -D__FLT_EVAL_METHOD__=0 -DUNICODE -DDECLSPEC=  '
+        OS_FLAGS = OS_FLAGS+' -U__FLT_EVAL_METHOD__ -D__FLT_EVAL_METHOD__=0 -DDECLSPEC=  '
 
     #OS_FLAGS='-DWIN32 -D_WIN32 -DWINDOWS /EHsc -D_CONSOLE  /DEBUG /Od  /FS /Z7 -D_DEBUG /MDd '
     OS_FLAGS = OS_FLAGS + \
