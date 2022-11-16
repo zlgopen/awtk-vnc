@@ -110,7 +110,7 @@ LINKFLAGS=OS_LINKFLAGS;
 LIBPATH=[LIB_DIR, BIN_DIR] + OS_LIBPATH
 CCFLAGS=OS_FLAGS + COMMON_CCFLAGS 
 
-STATIC_LIBS =['awtk_global', 'fscript_ext_widgets', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'linebreak', 'fribidi']
+STATIC_LIBS =['awtk_global', 'fscript_ext_widgets', 'extwidgets', 'widgets', 'awtk_vnc', 'vncserver', 'base', 'gpinyin', 'linebreak', 'fribidi', 'svgtiny']
 if TSLIB_LIB_DIR != '':
   SHARED_LIBS=['awtk', 'ts'] + OS_LIBS;
 else:
