@@ -93,9 +93,21 @@ OS_SUBSYSTEM_WINDOWS = ''
 OS_PROJECTS = []
 # only for c compiler flags
 COMMON_CFLAGS = ''
-OS_DEBUG = complie_helper.get_value('DEBUG')
+OS_DEBUG = complie_helper.get_value('DEBUG', True)
 
 if OS_NAME == 'Darwin':
+
+    # Find the correct SDL2 version
+    sdl_path = "/opt/homebrew/Cellar/sdl2/" 
+    if not os.path.exists(sdl_path) :
+        # Compatible with old systems
+        sdl_path = '/usr/local/Cellar/sdl2'
+    sdl_versions = os.listdir(sdl_path)
+    if len(sdl_versions)==0:
+        print("Can not find the SDL version")
+        exit(-1)
+    sdl_lib = sdl_path+ sdl_versions[0]+"/lib"
+
     TOOLS_NAME = ''
     OS_FLAGS = '-Wall -Wno-unused-function -fPIC -DWITHOUT_GLAD=1 '
     OS_LIBS = ['stdc++', 'iconv', 'pthread', 'm', 'dl']
@@ -103,7 +115,7 @@ if OS_NAME == 'Darwin':
     OS_FLAGS = OS_FLAGS + ' -DHAS_SEM_OPEN '
     OS_FLAGS = OS_FLAGS + ' -D__APPLE__ -DHAS_PTHREAD -DMACOS -Dmacintosh '
     OS_FLAGS = OS_FLAGS + ' -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS  -DBGFX_CONFIG_RENDERER_METAL=1 '
-    OS_LIBPATH = ['/usr/local/lib/', '/opt/homebrew/Cellar/sdl2/2.28.0/lib']
+    OS_LIBPATH = ['/usr/local/lib/', sdl_lib]
 
 elif OS_NAME == 'Linux':
     TOOLS_NAME = ''
@@ -112,7 +124,7 @@ elif OS_NAME == 'Linux':
                'sndio', 'stdc++', 'asound', 'pthread', 'm', 'dl']
     COMMON_CFLAGS = COMMON_CFLAGS+' -std=gnu99 '
     OS_FLAGS = OS_FLAGS + ' -DLINUX -DHAS_PTHREAD'
-    OS_FLAGS = OS_FLAGS + ' -DSDL_REAL_API -DSDL_TIMER_UNIX -DSDL_VIDEO_DRIVER_X11 -DSDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS '
+    OS_FLAGS = OS_FLAGS + ' -DSDL_TIMER_UNIX -DSDL_VIDEO_DRIVER_X11 -DSDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS '
     OS_FLAGS = OS_FLAGS + \
         ' -DSDL_AUDIO_DRIVER_SNDIO -DSDL_VIDEO_OPENGL_GLX -DSDL_VIDEO_RENDER_OGL '
     OS_FLAGS = OS_FLAGS + ' -DSDL_LOADSO_DLOPEN -DSDL_VIDEO_OPENGL_EGL -DSDL_VIDEO_OPENGL_ES2 '
@@ -326,6 +338,10 @@ def scons_db_check_and_remove():
       with open(f, "rb") as fs:
         pickle.load(fs)
         fs.close()
-    except:
+    except Exception as e :
         fs.close()
-        os.remove(f)
+        print(e)
+        try:
+            os.remove(f)
+        except Exception as e :
+            print(e)
