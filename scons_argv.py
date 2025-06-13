@@ -48,18 +48,18 @@ def set_compile_config() :
   else :
     os.chdir(CWD)
     INIT = True
-    complie_helper = compile_config.complie_helper()
-    complie_helper.set_compile_config(COMPILE_CONFIG)
-    complie_helper.try_load_default_config()
-    compile_config.set_curr_config(complie_helper)
-    return complie_helper
+    compile_helper = compile_config.compile_helper()
+    compile_helper.set_compile_config(COMPILE_CONFIG)
+    compile_helper.try_load_default_config()
+    compile_config.set_curr_config(compile_helper)
+    return compile_helper
 
 
 def init(ARGUMENTS) :
   global INIT
   INIT = True
-  complie_helper = compile_config.complie_helper()
-  complie_helper.set_compile_config(COMPILE_CONFIG)
-  complie_helper.try_load_default_config()
-  complie_helper.scons_user_sopt(ARGUMENTS)
-  compile_config.set_curr_config(complie_helper)
+  compile_helper = compile_config.compile_helper()
+  compile_helper.set_compile_config(COMPILE_CONFIG)
+  compile_helper.try_load_default_config()
+  compile_helper.scons_user_sopt(ARGUMENTS)
+  compile_config.set_curr_config(compile_helper)
